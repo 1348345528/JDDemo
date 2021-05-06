@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/model/FocusModel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
@@ -9,29 +11,46 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Widget _swiperWidget() {
-    List<Map> imgList = [
-      {"url": "https://www.itying.com/images/flutter/slide01.jpg"},
-      {"url": "https://www.itying.com/images/flutter/slide02.jpg"},
-      {"url": "https://www.itying.com/images/flutter/slide03.jpg"},
-    ];
 
-    return Container(
-      child: AspectRatio(
-        aspectRatio: 2 / 1,
-        child: Swiper(
-          itemBuilder: (BuildContext context, int index) {
-            return Image.network(
-              imgList[index]["url"],
-              fit: BoxFit.fill,
-            );
-          },
-          itemCount: 3,
-          pagination: new SwiperPagination(),
-          autoplay: true,
+  List<FocusItemModel> _focusData  = [];
+  @override
+  void initState(){
+   super.initState();
+   _getFocusData();
+   print(_focusData);
+  }
+
+  //获取轮播图图片
+  _getFocusData() async{
+     var api = "https://jd.itying.com/api/focus";
+     Map<String,dynamic> result = (await Dio().get(api)) as Map<String, dynamic>;
+     setState(() {
+       _focusData =  FocusModel.fromJson(result).result;
+     });
+  }
+
+  //轮播图
+  Widget _swiperWidget() {
+    if(this._focusData.length>0){
+      return Container(
+        child: AspectRatio(
+          aspectRatio: 2 / 1,
+          child: Swiper(
+            itemBuilder: (BuildContext context, int index) {
+              return Image.network(
+                _focusData[index].url,
+                fit: BoxFit.fill,
+              );
+            },
+            itemCount: _focusData.length,
+            pagination: new SwiperPagination(),
+            autoplay: true,
+          ),
         ),
-      ),
-    );
+      );
+    }else{
+      return Text("加载中");
+    }
   }
 
   //标题
