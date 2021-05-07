@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> {
    super.initState();
    _getFocusData();
    _getHotProduct();
+   _getRecProduct();
   }
 
   //获取轮播图图片
@@ -59,6 +60,8 @@ class _HomePageState extends State<HomePage> {
   Widget _swiperWidget() {
     if(this._focusData.length>0){
       return Container(
+        width: 392.h,
+        height: 196.h,
         child: AspectRatio(
           aspectRatio: 2 / 1,
           child: Swiper(
@@ -77,7 +80,11 @@ class _HomePageState extends State<HomePage> {
       );
     }else{
       return Container(
-        child: Text("加载中"),
+        width: 392.h,
+        height: 196.h,
+        child: Center(
+          child: Text("加载中"),
+        ),
       );
     }
   }
@@ -131,74 +138,72 @@ class _HomePageState extends State<HomePage> {
       child: Wrap(
         runSpacing: 10.h,
         spacing: 10.w,
-        children: [
-          // _recProductList(),
-          // _recProductList(),
-          // _recProductList(),
-          // _recProductList(),
-          // _recProductList(),
-          // _recProductList()
-        ],
+        children: _recProductList(),
       ),
     );
   }
 
   //推荐商品
   List<Widget> _recProductList() {
-    List<Widget> productList = List();
+    var itemWidth = (ScreenUtil().screenWidth - 35) / 2;
 
-    // _recProductData.forEach((element) {
-    //
-    // });
-    // var itemWidth = (ScreenUtil().screenWidth - 35) / 2;
-    // return Container(
-    //   padding: EdgeInsets.all(5),
-    //   width: itemWidth,
-    //   decoration: BoxDecoration(
-    //       border:
-    //           Border.all(color: Color.fromRGBO(233, 233, 233, 0.9), width: 1)),
-    //   child: Column(
-    //     children: [
-    //       Container(
-    //         width: double.infinity,
-    //         child: Image.network(
-    //           "https://www.itying.com/images/flutter/list1.jpg",
-    //           fit: BoxFit.cover,
-    //         ),
-    //       ),
-    //       Padding(
-    //         padding: EdgeInsets.only(top: 10.h),
-    //         child: Text(
-    //           "YIMU日本醋酸早春白色西装外套女春秋设计感小众2021新款高端套装",
-    //           maxLines: 2,
-    //           overflow: TextOverflow.ellipsis,
-    //           style: TextStyle(color: Colors.black54),
-    //         ),
-    //       ),
-    //       Padding(
-    //         padding: EdgeInsets.only(top: 10.h),
-    //         child: Stack(
-    //           children: [
-    //             Align(
-    //               alignment: Alignment.centerLeft,
-    //               child: Text(
-    //                 "￥188.0",
-    //                 style: TextStyle(color: Colors.red, fontSize: 16),
-    //               ),
-    //             ),
-    //             Align(
-    //               alignment: Alignment.centerRight,
-    //               child: Text(
-    //                 "￥198.0",
-    //                 style: TextStyle(color: Colors.black54, fontSize: 14,decoration: TextDecoration.lineThrough),
-    //               ),
-    //             )
-    //           ],
-    //         ),
-    //       )
-    //     ],
-    //   ),
-    // );
+    List<Widget> productList =  _recProductData.map((element) {
+        var pic = Config.domain+element.pic.replaceAll('\\', '/');
+
+        return Container(
+          padding: EdgeInsets.all(5),
+          width: itemWidth,
+          decoration: BoxDecoration(
+              border:
+              Border.all(color: Color.fromRGBO(233, 233, 233, 0.9), width: 1)),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                child: AspectRatio(
+                  aspectRatio: 1/1,
+                  child: Image.network(
+                    "${pic}",
+                    fit: BoxFit.cover,
+                  ),
+                )
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10.h),
+                child: Text(
+                  "${element.title}",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.black54),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10.h),
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "￥${element.price}",
+                        style: TextStyle(color: Colors.red, fontSize: 16),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        "${element.oldPrice}",
+                        style: TextStyle(color: Colors.black54, fontSize: 14,decoration: TextDecoration.lineThrough),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+    }).toList();
+
+  return productList;
   }
 
   @override
