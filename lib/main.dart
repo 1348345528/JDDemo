@@ -18,7 +18,7 @@ class _MyAppState extends State<MyApp> {
         designSize: Size(360, 690),
         builder:()=> MaterialApp(
           debugShowCheckedModeBanner:  false,
-          initialRoute: '/search',
+          initialRoute: '/',
           onGenerateRoute: onGenerateRoute,
           theme: ThemeData(
             primaryColor: Colors.white

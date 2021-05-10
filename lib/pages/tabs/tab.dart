@@ -52,7 +52,8 @@ class _TabsState extends State<Tabs> {
                   Text(
                       "笔记本",
                     style: TextStyle(
-                      fontSize: 16.sp
+                      fontSize: 16.sp,
+                      color: Colors.black12
                     ),
                   )
                 ],

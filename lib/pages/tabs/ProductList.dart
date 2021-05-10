@@ -61,6 +61,9 @@ class _ProductListState extends State<ProductList> {
 
   int _selectHeader = 1;
 
+  //配置搜索回显
+  var _initKeyWordsController = TextEditingController();
+
 
   @override
   void initState() {
@@ -83,6 +86,12 @@ class _ProductListState extends State<ProductList> {
         }
       }
     });
+
+    if(widget.arguments["keyWords"]==''){
+      _initKeyWordsController.text = "";
+    }else{
+      _initKeyWordsController.text = widget.arguments["keyWords"];
+    }
   }
 
   //获取商品列表的数据
@@ -91,8 +100,13 @@ class _ProductListState extends State<ProductList> {
       _flag = false;
     });
 
-    var api =
-        "${Config.domain}api/plist?cid=${widget.arguments["cid"]}&page=${_page}&sort=${_sort}&pageSize=${this._pageSize}";
+    var api ="";
+    if(widget.arguments["type"] == 'search'){
+      api = api+"${Config.domain}api/plist?search=${widget.arguments["keyWords"]}&page=${_page}&sort=${_sort}&pageSize=${this._pageSize}";
+    };
+    if(widget.arguments["type"] =="product"){
+      api = api+"${Config.domain}api/plist?cid=${widget.arguments["cid"]}&page=${_page}&sort=${_sort}&pageSize=${this._pageSize}";
+    };
     print(api);
     var result = await Dio().get(api);
     setState(() {
@@ -262,20 +276,20 @@ class _ProductListState extends State<ProductList> {
               flex: 1,
               child: InkWell(
                 child: Container(
-                  padding: EdgeInsets.fromLTRB(0, 16.h, 0, 16.h),
-                  child:Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "${value["title"]}",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: _selectHeader == value["id"]?Colors.red:Colors.black
+                    padding: EdgeInsets.fromLTRB(0, 16.h, 0, 16.h),
+                    child:Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${value["title"]}",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: _selectHeader == value["id"]?Colors.red:Colors.black
+                          ),
                         ),
-                      ),
-                      _showIcon(value["id"])
-                    ],
-                  )
+                        _showIcon(value["id"])
+                      ],
+                    )
                 ),
                 onTap: () {
                   _subHeaderChange(value["id"]);
@@ -302,8 +316,59 @@ class _ProductListState extends State<ProductList> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("商品列表"),
-        actions: [Text("")],
+        leading: Builder(
+          builder: (BuildContext context) {
+            final ScaffoldState scaffold = Scaffold.maybeOf(context);
+            final ModalRoute<dynamic> parentRoute = ModalRoute.of(context);
+            final bool hasEndDrawer = scaffold?.hasEndDrawer ?? false;
+            final bool canPop = parentRoute?.canPop ?? false;
+
+            if (hasEndDrawer && canPop) {
+              return BackButton();
+            } else {
+              return SizedBox.shrink();
+            }
+          },
+        ),
+        title: Container(
+          height: 30.h,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: Color.fromRGBO(233, 233, 233, 0.8),
+              borderRadius: BorderRadius.circular(30)
+          ),
+          child: TextField(
+            controller: _initKeyWordsController,
+            autofocus: false,
+            decoration: InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(30)
+                )
+            ),
+            onChanged: (value){
+            },
+          ),
+        ),
+        actions: [
+          InkWell(
+            onTap: (){
+              Navigator.pushReplacementNamed(context, "/productList",arguments: {
+                "keyWords":_initKeyWordsController.text,
+                "type":"search"
+              });
+            },
+            child: Container(
+              height: 30.h,
+              width: 35.h,
+              child: Row(
+                children: [
+                  Text("搜索")
+                ],
+              ),
+            ),
+          )
+        ],
       ),
       endDrawer: _drawer(),
       body: Stack(

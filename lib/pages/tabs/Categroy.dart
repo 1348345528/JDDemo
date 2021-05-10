@@ -117,7 +117,10 @@ class _CateGroyPageState extends State<CateGroyPage>
                 return InkWell(
                   onTap: () {
                     Navigator.pushNamed(context, "/productList",
-                        arguments: {"cid": _rightCateData[index].sId});
+                        arguments: {
+                      "cid": _rightCateData[index].sId,
+                          "type":"product"
+                    });
                   },
                   child: Container(
                     // padding: EdgeInsets.all(10),
