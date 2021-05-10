@@ -52,8 +52,7 @@ class _ProductListState extends State<ProductList> {
       "id": 1,
       "title": "综合",
       "fileds": "all",
-      "sort":
-          -1, //排序     升序：price_1     {price:1}        降序：price_-1   {price:-1}
+      "sort": -1, //排序     升序：price_1     {price:1}        降序：price_-1   {price:-1}
     },
     {"id": 2, "title": "销量", "fileds": 'salecount', "sort": -1},
     {"id": 3, "title": "价格", "fileds": 'price', "sort": -1},
@@ -214,9 +213,35 @@ class _ProductListState extends State<ProductList> {
     }else{
       setState(() {
         _selectHeader = id;
+        this._sort = "${_subHeaderList[id-1]["fileds"]}_${_subHeaderList[id-1]["sort"]}";
+
+        //重置分页
+        _page = 1;
+        //重置数据
+        _productList = [];
+        //回到顶部
+        _scrollController.jumpTo(0);
+        //重置_hasMore
+        _hasMore = true;
+
+        _subHeaderList[id-1]["sort"] = _subHeaderList[id-1]["sort"]*-1;
+        //重新请求
+        _getProductListData();
       });
     }
   }
+
+  //显示icon
+  Widget _showIcon(id){
+    if(id==2||id ==3){
+      if(_subHeaderList[id-1]["sort"] == -1){
+        return Icon(Icons.arrow_drop_up);
+      }
+      return Icon(Icons.arrow_drop_down);
+    }
+    return Text("");
+  }
+
 
   //筛选导航
   Widget _navigationWidget() {
@@ -238,13 +263,19 @@ class _ProductListState extends State<ProductList> {
               child: InkWell(
                 child: Container(
                   padding: EdgeInsets.fromLTRB(0, 16.h, 0, 16.h),
-                  child: Text(
-                    "${value["title"]}",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: _selectHeader == value["id"]?Colors.red:Colors.black
-                    ),
-                  ),
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "${value["title"]}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: _selectHeader == value["id"]?Colors.red:Colors.black
+                        ),
+                      ),
+                      _showIcon(value["id"])
+                    ],
+                  )
                 ),
                 onTap: () {
                   _subHeaderChange(value["id"]);

@@ -17,8 +17,12 @@ class _MyAppState extends State<MyApp> {
     return  ScreenUtilInit(
         designSize: Size(360, 690),
         builder:()=> MaterialApp(
-          initialRoute: '/',
+          debugShowCheckedModeBanner:  false,
+          initialRoute: '/search',
           onGenerateRoute: onGenerateRoute,
+          theme: ThemeData(
+            primaryColor: Colors.white
+          ),
         )
     );
   }
