@@ -64,10 +64,18 @@ class _ProductListState extends State<ProductList> {
   //配置搜索回显
   var _initKeyWordsController = TextEditingController();
 
+  //是否有搜索数据
+  bool _hasData = true;
+
 
   @override
   void initState() {
     super.initState();
+    if(widget.arguments["keyWords"]==''){
+      _initKeyWordsController.text = "";
+    }else{
+      _initKeyWordsController.text = widget.arguments["keyWords"];
+    }
     _getProductListData();
 
     //下拉分页
@@ -86,12 +94,6 @@ class _ProductListState extends State<ProductList> {
         }
       }
     });
-
-    if(widget.arguments["keyWords"]==''){
-      _initKeyWordsController.text = "";
-    }else{
-      _initKeyWordsController.text = widget.arguments["keyWords"];
-    }
   }
 
   //获取商品列表的数据
@@ -102,13 +104,23 @@ class _ProductListState extends State<ProductList> {
 
     var api ="";
     if(widget.arguments["type"] == 'search'){
-      api = api+"${Config.domain}api/plist?search=${widget.arguments["keyWords"]}&page=${_page}&sort=${_sort}&pageSize=${this._pageSize}";
+      api = api+"${Config.domain}api/plist?search=${_initKeyWordsController.text}&page=${_page}&sort=${_sort}&pageSize=${this._pageSize}";
     };
     if(widget.arguments["type"] =="product"){
       api = api+"${Config.domain}api/plist?cid=${widget.arguments["cid"]}&page=${_page}&sort=${_sort}&pageSize=${this._pageSize}";
     };
     print(api);
     var result = await Dio().get(api);
+    print("---------------------");
+    print(ProductModel.fromJson(result.data).result);
+
+    if(ProductModel.fromJson(result.data).result.length == 0&&_page == 0){
+      setState(() {
+        _hasData = false;
+      });
+    }else{
+      _hasData = true;
+    }
     setState(() {
       _productList.addAll(ProductModel.fromJson(result.data).result);
       if (ProductModel.fromJson(result.data).result.length < 8) {
@@ -353,10 +365,8 @@ class _ProductListState extends State<ProductList> {
         actions: [
           InkWell(
             onTap: (){
-              Navigator.pushReplacementNamed(context, "/productList",arguments: {
-                "keyWords":_initKeyWordsController.text,
-                "type":"search"
-              });
+              widget.arguments["type"] = 'search';
+              _subHeaderChange(1);
             },
             child: Container(
               height: 30.h,
@@ -371,11 +381,13 @@ class _ProductListState extends State<ProductList> {
         ],
       ),
       endDrawer: _drawer(),
-      body: Stack(
+      body: _hasData?Stack(
         children: [
           _productListWidget(),
           _navigationWidget(),
         ],
+      ):Center(
+        child: Text("没有数据"),
       ),
     );
   }

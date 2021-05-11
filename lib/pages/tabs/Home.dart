@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_jd/config/Config.dart';
 import 'package:flutter_jd/model/FocusModel.dart';
 import 'package:flutter_jd/model/ProductModel.dart';
+import 'package:flutter_jd/service/SearchService.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 

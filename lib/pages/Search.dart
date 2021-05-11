@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/service/SearchService.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SearchPage extends StatefulWidget {
@@ -10,6 +11,67 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
 
   var _keyWords ;
+
+  List _historyListData = [];
+
+  @override
+  void initState() {
+      super.initState();
+      _getHistroyListData();
+  }
+
+  //获取历史记录数据
+  _getHistroyListData() async{
+      var result = await SearchService.getSearchData();
+      setState(() {
+        _historyListData = result;
+      });
+  }
+
+  //历史记录Widget
+  Widget _histroyListWidget(){
+      return _historyListData.length>0?Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            child: Text("历史记录",style: Theme.of(context).textTheme.title),
+          ),
+          Divider(),
+          Column(
+            children: _historyListData.map((e){
+              return Column(
+                children: [
+                  ListTile(
+                    title: Text(e),
+                  ),
+                  Divider(height: 1.h,)
+                ],
+              );
+            }).toList(),
+          ),
+          SizedBox(height: 50.h,),
+          InkWell(
+            onTap: null,
+            child: Container(
+                height: 50.h,
+                decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Color.fromRGBO(233, 233, 233, 1),
+                        width: 1.w
+                    )
+                ),
+                child:Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.delete),
+                    Text("清空历史记录")
+                  ],
+                )
+            ),
+          )
+        ],
+      ):Text("");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +85,7 @@ class _SearchPageState extends State<SearchPage> {
               borderRadius: BorderRadius.circular(30)
           ),
           child: TextField(
-            autofocus: true,
+            autofocus: false,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderSide: BorderSide.none,
@@ -38,6 +100,8 @@ class _SearchPageState extends State<SearchPage> {
         actions: [
           InkWell(
             onTap: (){
+              SearchService.setSearchData(_keyWords);
+
               Navigator.pushReplacementNamed(context, "/productList",arguments: {
                   "keyWords":_keyWords,
                   "type":"search"
@@ -140,78 +204,7 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
             SizedBox(height: 10.h),
-            Container(
-              child: Text("历史记录",style: Theme.of(context).textTheme.title),
-            ),
-            Divider(),
-            Column(
-              children: [
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-                ListTile(
-                  title: Text("女装"),
-                ),
-                Divider(),
-              ],
-            ),
-            SizedBox(height: 50.h,),
-            InkWell(
-              onTap: null,
-              child: Container(
-                  height: 50.h,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Color.fromRGBO(233, 233, 233, 1),
-                          width: 1.w
-                      )
-                  ),
-                  child:Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.delete),
-                      Text("清空历史记录")
-                    ],
-                  )
-              ),
-            )
+            _histroyListWidget()
           ],
         ),
       )
